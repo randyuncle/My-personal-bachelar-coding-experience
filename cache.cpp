@@ -11,11 +11,9 @@
 #define FA 2
 #define FIFO 0
 #define LRU 1
+#define lli long long int
 
 using namespace std;
-
-//global
-unsigned int turns = 0, miss = 0;
 
 typedef struct node *list;
 typedef struct node{
@@ -23,9 +21,9 @@ typedef struct node{
     int index; //which block in the set the value is in
 }node;
 list front[512], rear[512]; //dequeue LRU
-unordered_map<unsigned int, list> h; //save the pointer (use the original word to mark)
+unordered_map<lli, list> h; //save the pointer (use the original word to mark)
 
-void newNode(int index, unsigned int address,int set){
+void newNode(int index, lli address,int set){
     list n = (list)malloc(sizeof(node));
     n->next = NULL;
     n->index = index;
@@ -69,6 +67,7 @@ int main(int argc, char *argv[]){
     int cache_size , block_size, associativity, replace;
     file_in >> cache_size >> block_size >> associativity >> replace;
     
+    int turns = 0, miss = 0;
     int set, index;
     /**
      * @brief define the associativity 
@@ -95,7 +94,7 @@ int main(int argc, char *argv[]){
      * time -> FIFO replace save
      */
     int cache[set][index], time[set]; 
-    unsigned int address;
+    lli address;
     bool inCache = false;
     memset(cache, -1, sizeof(cache));
     memset(time, 0, sizeof(time));
@@ -108,7 +107,7 @@ int main(int argc, char *argv[]){
                 cache[tag][i] = value;
                 printf("-1\n");
 
-                frequencyChk(address, i, tag, re);
+                frequencyChk(address, i, tag, replace);
                 inCache = true;
                 miss++;
                 break;
@@ -152,6 +151,6 @@ int main(int argc, char *argv[]){
         inCache = false;
     }
 
-    printf("%f", miss / turns);
+    cout << miss / turns;
     return 0;
 }
