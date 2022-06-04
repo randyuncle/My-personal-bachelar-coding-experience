@@ -1,2 +1,2 @@
 # NCKU_CSIE_HomeworkCodes
- homework codes
+ homework codes from the NCKU CSIE
