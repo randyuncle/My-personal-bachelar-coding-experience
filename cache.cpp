@@ -125,11 +125,6 @@ int main(int argc, char *argv[]){
         }
         inCache = false;
     }
-
-<<<<<<< Updated upstream
-    file_out << "Miss rate = "  << fixed << setprecision(6)  << miss / turns;
-=======
-    file_out << "Miss rate : " << fixed << setprecision(6) << miss / turns;
->>>>>>> Stashed changes
+    file_out << "Miss rate = " << fixed << setprecision(6)  << miss / turns;
     return 0;
 }
