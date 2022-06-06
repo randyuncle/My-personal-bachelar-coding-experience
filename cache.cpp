@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <iomanip>
 #include <cstring>
 #include <cmath>
 
@@ -38,7 +39,6 @@ int main(int argc, char *argv[]){
     fstream file_in, file_out;
     file_in.open(argv[1], ios::in);
     file_out.open(argv[2], ios::out);
-    file_out.precision(6);
 
     int cache_size , block_size, associativity, replace;
     file_in >> cache_size >> block_size >> associativity >> replace;
@@ -126,6 +126,6 @@ int main(int argc, char *argv[]){
         inCache = false;
     }
 
-    file_out << miss / turns << endl;
+    file_out << "Miss rate = "  << fixed << setprecision(6)  << miss / turns;
     return 0;
 }
