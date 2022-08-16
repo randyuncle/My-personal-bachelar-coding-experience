@@ -34,7 +34,6 @@ void LRUupdate(lli *cache, int place, int index, int replace){
     cache[i] = temp;
 }
 
-//int main(int argc, char *argv[])
 int main(int argc, char *argv[]){
     fstream file_in, file_out;
     file_in.open(argv[1], ios::in);
