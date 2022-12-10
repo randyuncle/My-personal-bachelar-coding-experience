@@ -1,0 +1,9 @@
+function [out] = irwin_hall_sample(n)
+%IRWIN_HALL_SAMPLE Summary of this function goes here
+%   Detailed explanation goes here
+out = zeros(1:10^6);
+for i = 1:n
+    out = out + rand(1, 10^6);
+end
+end
+
