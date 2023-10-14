@@ -8,28 +8,28 @@ This is a repository that lists and saves the homework and in-term projects I do
 
 * Program Design I (C)
 * Program Design II (Java)
-    - PD2 final oral project - order system
-    - PD2 final team project - Rescue the world (2D game)
+    - [PD2 final oral project - order system](https://github.com/randyuncle/PD2-Final-Oral-Project---OrderSystem)
+    - [PD2 final team project - Rescue the world (2D game)](https://github.com/randyuncle/PD2-final-group-project)
 
 ### 2nd grade
 
 * DataStructures
 * Window Programming
-    - Viking run (Unity game)
-    - Final team project - CubeTimer
+    - [Viking run (Unity game)](https://github.com/randyuncle/F74094017_Unity_v4)
+    - [Final team project - CubeTimer](https://github.com/randyuncle/Cubetimer-1)
 * Algorithms
 * Computer Organization
 * Probability and Statistics
 
 ### 3rd grade
 
-* LineChatbot, the final project for `Theory of Computation`
+* [LineChatbot](https://github.com/randyuncle/LineChatbot), the final project for `Theory of Computation`
 * Operating System (currently in github classroom, to be uploaded)
 * Compiler System (currently in github classroom, to be uploaded)
-* Multimedia principles and applications (to be uploaded)
+* Multimedia principles and applications
 * Computer System Administration (to be uploaded)
 
 ### 4th grade
 
 * Introduction to Artificial Intelligence
-* Introduction to Image Processing, Computer Vision, and Deep Learning 
+* * Introduction to Image Processing, Computer Vision, and Deep Learning (TBA)
