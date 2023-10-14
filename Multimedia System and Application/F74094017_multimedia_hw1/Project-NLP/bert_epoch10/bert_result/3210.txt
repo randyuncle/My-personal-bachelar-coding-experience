@@ -1,0 +1,2 @@
+train_acc: 0.358
+val_acc: 0.350
