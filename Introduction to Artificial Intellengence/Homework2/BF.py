@@ -1,7 +1,5 @@
-import random
-import math
 from typing import List
-import itertools
+# import itertools
 
 """
 Calculating the distance between the regions in adjacency list `mat`
@@ -14,6 +12,23 @@ def total_distance(mat, path):
 
     return dist
 
+"""
+Doing the job that serves quite same as `itertools.permutations()`
+"""
+def generate_permutations(arr):
+    if len(arr) == 0:
+        return [[]]
+    
+    permutations = []
+    # generate permutations
+    for i in range(len(arr)):
+        first_elem = arr[i]
+        rest = arr[:i] + arr[i+1:]
+        for p in generate_permutations(rest):
+            permutations.append([first_elem] + p)
+    
+    return permutations
+
 """`The Brute Force for homework problem
 Args:
     mat (List[List[int]]): The adjacency list of the distances between the regions.
@@ -23,17 +38,22 @@ Return:
 """
 def BF(mat):
 
-    # list the node without start and end points
+    # list the nodes without start and end points
     unvisited_nodes = list(range(1, len(mat)))
-    # using permutations in itertools to generate every possible combinations between regions
-    permutations = list(itertools.permutations(unvisited_nodes))
+
+    # Generate every possible permutations between regions
+    # 參考：permutations = list(itertools.permutations(unvisited_nodes))
+    permutations = generate_permutations(unvisited_nodes)
 
     # init. properties in shortest path
     shortest_path = [0] + unvisited_nodes + [0]
     shortest_distance = total_distance(mat, shortest_path)
 
+    # comparing which path is the shortest
     for perm in permutations:
-        path = [0] + list(perm) + [0]
+        # generate path from our permutations
+        path = [0] + perm + [0]
+        # getting total distance
         distance = total_distance(mat, path)
         if distance < shortest_distance:
             shortest_path = path
