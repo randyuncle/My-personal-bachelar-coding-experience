@@ -32,4 +32,4 @@ This is a repository that lists and saves the homework and in-term projects I do
 ### 4th grade
 
 * Introduction to Artificial Intelligence
-* * Introduction to Image Processing, Computer Vision, and Deep Learning (TBA)
+* Introduction to Image Processing, Computer Vision, and Deep Learning (TBA)
