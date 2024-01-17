@@ -1,0 +1,1054 @@
+poetry run pytest -vv api/tests
+============================= test session starts ==============================
+platform freebsd13 -- Python 3.9.17, pytest-7.1.3, pluggy-1.0.0 -- /root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/bin/python
+cachedir: .pytest_cache
+rootdir: /usr/home/rkhuncle/lab4, configfile: setup.cfg
+plugins: asyncio-0.20.3, anyio-3.6.2
+asyncio: mode=auto
+collecting ... collected 12 items
+
+api/tests/test_file.py::TestCreateFile::test_create_file_success FAILED  [  8%]
+api/tests/test_file.py::TestCreateFile::test_create_file_duplicate ERROR [ 16%]
+api/tests/test_file.py::TestCreateFile::test_create_file_too_large PASSED [ 25%]
+api/tests/test_file.py::TestRetrieveFile::test_retrieve_file_success ERROR [ 33%]
+api/tests/test_file.py::TestRetrieveFile::test_retrieve_file_none_exists FAILED [ 41%]
+api/tests/test_file.py::TestUpdateFile::test_update_file_success ERROR   [ 50%]
+api/tests/test_file.py::TestUpdateFile::test_update_file_none_exists FAILED [ 58%]
+api/tests/test_file.py::TestUpdateFile::test_update_file_too_large ERROR [ 66%]
+api/tests/test_file.py::TestDeleteFile::test_delete_file_success ERROR   [ 75%]
+api/tests/test_file.py::TestDeleteFile::test_delete_file_none_exists FAILED [ 83%]
+api/tests/test_fix.py::TestFixFile::test_fix_file_success ERROR          [ 91%]
+api/tests/test_health.py::test_get_health_success PASSED                 [100%]
+
+==================================== ERRORS ====================================
+_________ ERROR at setup of TestCreateFile.test_create_file_duplicate __________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_create_file_duplicate>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x803a168b0>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+________ ERROR at setup of TestRetrieveFile.test_retrieve_file_success _________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_retrieve_file_success>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x8040da700>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+__________ ERROR at setup of TestUpdateFile.test_update_file_success ___________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_update_file_success>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x803928670>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+_________ ERROR at setup of TestUpdateFile.test_update_file_too_large __________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_update_file_too_large>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x8040daaf0>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+__________ ERROR at setup of TestDeleteFile.test_delete_file_success ___________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_delete_file_success>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x8040da310>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+_____________ ERROR at setup of TestFixFile.test_fix_file_success ______________
+
+event_loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+request = <SubRequest 'create_file' for <Function test_fix_file_success>>
+kwargs = {'file': <_io.BufferedReader name='/tmp/m3ow87.txt'>}
+setup = <function _wrap_async_fixture.<locals>._async_fixture_wrapper.<locals>.setup at 0x803a0e5e0>
+
+    @functools.wraps(fixture)
+    def _async_fixture_wrapper(
+        event_loop: asyncio.AbstractEventLoop, request: SubRequest, **kwargs: Any
+    ):
+        func = _perhaps_rebind_fixture_func(
+            fixture, request.instance, fixturedef.unittest
+        )
+    
+        async def setup():
+            res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+            return res
+    
+>       return event_loop.run_until_complete(setup())
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.9/asyncio/base_events.py:647: in run_until_complete
+    return future.result()
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/pytest_asyncio/plugin.py:318: in setup
+    res = await func(**_add_kwargs(func, kwargs, event_loop, request))
+api/tests/conftest.py:71: in create_file
+    await storage.create_file(upload_file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+---------------------------- Captured stdout setup -----------------------------
+5
+95
+=================================== FAILURES ===================================
+___________________ TestCreateFile.test_create_file_success ____________________
+
+request = <starlette.requests.Request object at 0x803912d90>
+
+    async def call_next(request: Request) -> Response:
+        app_exc: typing.Optional[Exception] = None
+        send_stream, recv_stream = anyio.create_memory_object_stream()
+    
+        async def coro() -> None:
+            nonlocal app_exc
+    
+            async with send_stream:
+                try:
+                    await self.app(scope, request.receive, send_stream.send)
+                except Exception as exc:
+                    app_exc = exc
+    
+        task_group.start_soon(coro)
+    
+        try:
+>           message = await recv_stream.receive()
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/base.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_receive_channels=1, waiting_receivers=OrderedDict(), waiting_senders=OrderedDict()), _closed=False)
+
+    async def receive(self) -> T_Item:
+        await checkpoint()
+        try:
+>           return self.receive_nowait()
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/anyio/streams/memory.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_receive_channels=1, waiting_receivers=OrderedDict(), waiting_senders=OrderedDict()), _closed=False)
+
+    def receive_nowait(self) -> T_Item:
+        """
+        Receive the next item if it can be done without waiting.
+    
+        :return: the received item
+        :raises ~anyio.ClosedResourceError: if this send stream has been closed
+        :raises ~anyio.EndOfStream: if the buffer is empty and this stream has been
+            closed from the sending end
+        :raises ~anyio.WouldBlock: if there are no items in the buffer and no tasks
+            waiting to send
+    
+        """
+        if self._closed:
+            raise ClosedResourceError
+    
+        if self._state.waiting_senders:
+            # Get the item from the next sender
+            send_event, item = self._state.waiting_senders.popitem(last=False)
+            self._state.buffer.append(item)
+            send_event.set()
+    
+        if self._state.buffer:
+            return self._state.buffer.popleft()
+        elif not self._state.open_send_channels:
+>           raise EndOfStream
+E           anyio.EndOfStream
+
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/anyio/streams/memory.py:87: EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+self = <tests.test_file.TestCreateFile object at 0x8038bca60>
+file = <_io.BufferedReader name='/tmp/m3ow87.txt'>
+
+    async def test_create_file_success(self, file: BinaryIO):
+        req = RequestBody(
+            url="file:create_file",
+            body=None,
+            files={"file": ("m3ow87.txt", file, "text/plain")},
+        )
+        resp = ResponseBody(
+            status_code=201,
+            body={
+                **DEFAULT_FILE.dict(),
+                **{"content": base64.b64encode(DEFAULT_FILE.content.encode()).decode()},
+            },
+        )
+>       await assert_request("post", req, resp)
+
+api/tests/test_file.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+api/tests/__init__.py:44: in __call__
+    resp: Response = await ac.request(
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_client.py:1527: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_client.py:1614: in send
+    response = await self._send_handling_auth(
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_client.py:1642: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_client.py:1679: in _send_handling_redirects
+    response = await self._send_single_request(request)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_client.py:1716: in _send_single_request
+    response = await transport.handle_async_request(request)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/httpx/_transports/asgi.py:152: in handle_async_request
+    await self.app(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/fastapi/applications.py:270: in __call__
+    await super().__call__(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/applications.py:124: in __call__
+    await self.middleware_stack(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/base.py:72: in __call__
+    response = await self.dispatch_func(request, call_next)
+api/app.py:38: in log_response
+    response = await call_next(request)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/base.py:46: in call_next
+    raise app_exc
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/base.py:36: in coro
+    await self.app(scope, request.receive, send_stream.send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/exceptions.py:75: in __call__
+    raise exc
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/middleware/exceptions.py:64: in __call__
+    await self.app(scope, receive, sender)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py:21: in __call__
+    raise e
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/routing.py:680: in __call__
+    await route.handle(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/routing.py:275: in handle
+    await self.app(scope, receive, send)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/starlette/routing.py:65: in app
+    response = await func(request)
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/fastapi/routing.py:231: in app
+    raw_response = await run_endpoint_function(
+/root/.cache/pypoetry/virtualenvs/system-admin-homework-template-ka3fNeqi-py3.9/lib/python3.9/site-packages/fastapi/routing.py:160: in run_endpoint_function
+    return await dependant.call(**values)
+api/endpoints/file.py:16: in create_file
+    msg = await storage.create_file(file)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <storage.Storage object at 0x803042f70>
+file = <_io.BufferedWriter name='/tmp/block-2/m3ow87.txt'>
+
+    async def create_file(self, file: UploadFile) -> schemas.File:
+        # TODO: create file with data block and parity block and return it's schema
+    
+        filename = file.filename
+        content_type = file.content_type
+        content = await file.read()
+        size = len(content)
+        n = settings.NUM_DISKS
+    
+        if size > settings.MAX_SIZE:
+            return schemas.File(
+                name="too_big",
+                size=size,
+                checksum="too_big",
+                content="too_big",
+                content_type=content_type,
+            )
+        """
+        check = os.path.join(settings.UPLOAD_PATH, f"{settings.FOLDER_PREFIX}-{0}")
+        check_file = os.path.join(check, filename)
+    
+        if not os.path.isfile(check_file):
+            return schemas.File(
+                name="file_exist",
+                size=size,
+                checksum="file_exist",
+                content="file_exist",
+                content_type=content_type,
+            )
+        """
+    
+        whole_array = bytearray(content)
+    
+        file_size = int(len(whole_array) / (n - 1))
+        mod = len(whole_array) % (n - 1)
+        if mod > 0:
+            file_size += 1
+    
+    
+        parity = [bytearray([0] * file_size) for k in range(n)]
+    
+        arr_count = 0
+        i = 0
+        print(len(parity))
+        directories = os.listdir(settings.UPLOAD_PATH)
+        print(len(directories))
+        for d in directories:
+            d_path = os.path.join(settings.UPLOAD_PATH, d)
+            file_path = os.path.join(d_path, filename)
+    
+            if i < (n - 1):
+                for j in range(file_size):
+                    if j == (file_size - 1):
+                        if i < mod:
+                            parity[i][j] = whole_array[arr_count]
+                            arr_count += 1
+                    else:
+                        parity[i][j] = whole_array[arr_count]
+                        arr_count += 1
+                    parity[-1][j] ^= parity[i][j]
+            # if i < n:
+            with open(file_path, "wb") as file:
+            # Write content to the file
+>               file.write(parity[i])
+E               IndexError: list index out of range
+
+api/storage.py:140: IndexError
+----------------------------- Captured stdout call -----------------------------
+5
+95
+----------------------------- Captured stderr call -----------------------------
+2023-06-22 21:38:04.560 | INFO     | app:log_request:29 - [127.0.0.1:127.0.0.1] POST https://localhost/api/file/
+2023-06-22 21:38:04.560 | INFO     | app:log_request:32 - header: Headers({'host': 'localhost', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.0', 'content-length': '198', 'content-type': 'multipart/form-data; boundary=8e1143b4c0322a865250f07a8cde2ead'})
+_______________ TestRetrieveFile.test_retrieve_file_none_exists ________________
+
+self = <tests.test_file.TestRetrieveFile object at 0x8038e7070>
+
+    async def test_retrieve_file_none_exists(self):
+        req = RequestBody(
+            url="file:retrieve_file", body=None, params={"filename": "non-exists.txt"}
+        )
+        resp = ResponseBody(status_code=404, body={"detail": "File not found"})
+>       await assert_request("get", req, resp)
+
+api/tests/test_file.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.AssertRequest object at 0x802bf7250>, method = 'get'
+req_body = RequestBody(url='file:retrieve_file', body=None, params={'filename': 'non-exists.txt'}, files=None)
+resp_body = ResponseBody(status_code=404, body={'detail': 'File not found'})
+assert_func = None, args = (), kwargs = {}
+ac = <httpx.AsyncClient object at 0x804208430>, url = '/api/file/'
+resp = <Response [200 OK]>, @py_assert1 = 200, @py_assert5 = 404
+@py_assert3 = False
+@py_format7 = "200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+@py_format9 = "assert 200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+
+    async def __call__(
+        self,
+        method: str,
+        req_body: RequestBody,
+        resp_body: ResponseBody,
+        assert_func: Callable = None,
+        *args,
+        **kwargs,
+    ):
+        async with AsyncClient(app=APP, base_url="https://localhost") as ac:
+            url = APP.url_path_for(req_body.url)
+            resp: Response = await ac.request(
+                method,
+                url,
+                json=req_body.body,
+                files=req_body.files,
+                params=req_body.params,
+            )
+    
+            # If assert_func is not None, use assert_func to assert
+            if assert_func is not None:
+                assert_func(resp, resp_body, *args, **kwargs)
+            else:
+>               assert resp.status_code == resp_body.status_code
+E               AssertionError: assert 200 == 404
+E                +  where 200 = <Response [200 OK]>.status_code
+E                +  and   404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code
+
+api/tests/__init__.py:56: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2023-06-22 21:38:05.502 | INFO     | app:log_request:29 - [127.0.0.1:127.0.0.1] GET https://localhost/api/file/?filename=non-exists.txt
+2023-06-22 21:38:05.502 | INFO     | app:log_request:32 - header: Headers({'host': 'localhost', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.0'})
+2023-06-22 21:38:05.503 | INFO     | app:log_response:43 - 200 b'm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3owm3ow'
+_________________ TestUpdateFile.test_update_file_none_exists __________________
+
+self = <tests.test_file.TestUpdateFile object at 0x8038e73a0>
+file = <_io.BufferedReader name='/tmp/m3ow87.txt'>
+
+    async def test_update_file_none_exists(self, file: BinaryIO):
+        req = RequestBody(
+            url="file:update_file",
+            body=None,
+            files={"file": ("non-exists.txt", file, "text/plain")},
+        )
+        resp = ResponseBody(status_code=404, body={"detail": "File not found"})
+>       await assert_request("put", req, resp)
+
+api/tests/test_file.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.AssertRequest object at 0x802bf7250>, method = 'put'
+req_body = RequestBody(url='file:update_file', body=None, params=None, files={'file': ('non-exists.txt', <_io.BufferedReader name='/tmp/m3ow87.txt'>, 'text/plain')})
+resp_body = ResponseBody(status_code=404, body={'detail': 'File not found'})
+assert_func = None, args = (), kwargs = {}
+ac = <httpx.AsyncClient object at 0x803a2ea30>, url = '/api/file/'
+resp = <Response [200 OK]>, @py_assert1 = 200, @py_assert5 = 404
+@py_assert3 = False
+@py_format7 = "200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+@py_format9 = "assert 200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+
+    async def __call__(
+        self,
+        method: str,
+        req_body: RequestBody,
+        resp_body: ResponseBody,
+        assert_func: Callable = None,
+        *args,
+        **kwargs,
+    ):
+        async with AsyncClient(app=APP, base_url="https://localhost") as ac:
+            url = APP.url_path_for(req_body.url)
+            resp: Response = await ac.request(
+                method,
+                url,
+                json=req_body.body,
+                files=req_body.files,
+                params=req_body.params,
+            )
+    
+            # If assert_func is not None, use assert_func to assert
+            if assert_func is not None:
+                assert_func(resp, resp_body, *args, **kwargs)
+            else:
+>               assert resp.status_code == resp_body.status_code
+E               AssertionError: assert 200 == 404
+E                +  where 200 = <Response [200 OK]>.status_code
+E                +  and   404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code
+
+api/tests/__init__.py:56: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2023-06-22 21:38:05.523 | INFO     | app:log_request:29 - [127.0.0.1:127.0.0.1] PUT https://localhost/api/file/
+2023-06-22 21:38:05.523 | INFO     | app:log_request:32 - header: Headers({'host': 'localhost', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.0', 'content-length': '202', 'content-type': 'multipart/form-data; boundary=11a2d42745a2b2a2264774f7d4b0f685'})
+2023-06-22 21:38:05.524 | INFO     | app:log_response:43 - 200 b'{"name":"m3ow.txt","size":123,"checksum":"b4d2f02737de412df62e30d4d3de5a0b","content":"","content_type":"text/plain"}'
+_________________ TestDeleteFile.test_delete_file_none_exists __________________
+
+self = <tests.test_file.TestDeleteFile object at 0x8038e7a00>
+
+    async def test_delete_file_none_exists(self):
+        req = RequestBody(
+            url="file:delete_file", body=None, params={"filename": "non-exists.txt"}
+        )
+        resp = ResponseBody(status_code=404, body={"detail": "File not found"})
+>       await assert_request("delete", req, resp)
+
+api/tests/test_file.py:166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.AssertRequest object at 0x802bf7250>, method = 'delete'
+req_body = RequestBody(url='file:delete_file', body=None, params={'filename': 'non-exists.txt'}, files=None)
+resp_body = ResponseBody(status_code=404, body={'detail': 'File not found'})
+assert_func = None, args = (), kwargs = {}
+ac = <httpx.AsyncClient object at 0x8040b5a90>, url = '/api/file/'
+resp = <Response [200 OK]>, @py_assert1 = 200, @py_assert5 = 404
+@py_assert3 = False
+@py_format7 = "200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+@py_format9 = "assert 200\n{200 = <Response [200 OK]>.status_code\n} == 404\n{404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code\n}"
+
+    async def __call__(
+        self,
+        method: str,
+        req_body: RequestBody,
+        resp_body: ResponseBody,
+        assert_func: Callable = None,
+        *args,
+        **kwargs,
+    ):
+        async with AsyncClient(app=APP, base_url="https://localhost") as ac:
+            url = APP.url_path_for(req_body.url)
+            resp: Response = await ac.request(
+                method,
+                url,
+                json=req_body.body,
+                files=req_body.files,
+                params=req_body.params,
+            )
+    
+            # If assert_func is not None, use assert_func to assert
+            if assert_func is not None:
+                assert_func(resp, resp_body, *args, **kwargs)
+            else:
+>               assert resp.status_code == resp_body.status_code
+E               AssertionError: assert 200 == 404
+E                +  where 200 = <Response [200 OK]>.status_code
+E                +  and   404 = ResponseBody(status_code=404, body={'detail': 'File not found'}).status_code
+
+api/tests/__init__.py:56: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2023-06-22 21:38:05.590 | INFO     | app:log_request:29 - [127.0.0.1:127.0.0.1] DELETE https://localhost/api/file/?filename=non-exists.txt
+2023-06-22 21:38:05.591 | INFO     | app:log_request:32 - header: Headers({'host': 'localhost', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.23.0'})
+2023-06-22 21:38:05.591 | INFO     | app:log_response:43 - 200 b'{"detail":"File deleted"}'
+=========================== short test summary info ============================
+FAILED api/tests/test_file.py::TestCreateFile::test_create_file_success - Ind...
+FAILED api/tests/test_file.py::TestRetrieveFile::test_retrieve_file_none_exists
+FAILED api/tests/test_file.py::TestUpdateFile::test_update_file_none_exists
+FAILED api/tests/test_file.py::TestDeleteFile::test_delete_file_none_exists
+ERROR api/tests/test_file.py::TestCreateFile::test_create_file_duplicate - In...
+ERROR api/tests/test_file.py::TestRetrieveFile::test_retrieve_file_success - ...
+ERROR api/tests/test_file.py::TestUpdateFile::test_update_file_success - Inde...
+ERROR api/tests/test_file.py::TestUpdateFile::test_update_file_too_large - In...
+ERROR api/tests/test_file.py::TestDeleteFile::test_delete_file_success - Inde...
+ERROR api/tests/test_fix.py::TestFixFile::test_fix_file_success - IndexError:...
+==================== 4 failed, 2 passed, 6 errors in 1.10s =====================
+*** Error code 1
+
+Stop.
+make: stopped in /usr/home/rkhuncle/lab4

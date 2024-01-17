@@ -7,7 +7,7 @@ hw4: SA HW4 directory
     |
     -- hostRelated: The directory that is built by `sacertsign` bash shell script to sign the certificate.
     |   
-    -- lab4: [(Initialled by TA)](https://github.com/NCKU-NASA/musical-potato) The API directory that we need to complete in HW4, which is implemented in FastAPI.
+    -- musical-potato: [(Initialled by TA)](https://github.com/NCKU-NASA/musical-potato) The API directory that we need to complete in HW4, which is implemented in FastAPI.
     |
     -- NCKU_SA_2023_HW4.pdf: The homework discription pdf.
     |
