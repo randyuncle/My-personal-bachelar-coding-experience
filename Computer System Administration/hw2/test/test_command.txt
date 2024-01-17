@@ -1,0 +1,8 @@
+./sahw2.sh --md5 4a4be40c96ac6314e91d93f38043a634 --sha256 77af778b51abd4a3c51c5ddd97204a9c3ae614ebccb75a606c3b6865aed6744e -i data1.csv data2.csv
+./sahw2.sh --md5 4a4be40c96ac6314e91d93f38043a634 -i data1.csv data2.csv
+./sahw2.sh --md5 ac3b27ddf21ec9d528a214c9560a92ba -i test/data1
+./sahw2.sh --md5 4a8ac9626f650e3d86c4f3e881d4ea82 -i test/data2
+
+
+jq ".[0] | .groups[]" "test/data1"
+jq ".[0] | .groups | length == 0" "test/data1"
