@@ -27,7 +27,7 @@ This is a repository that lists and saves the homework and in-term projects I do
 * Operating System
 * Compiler System (currently in github classroom, to be uploaded)
 * Multimedia principles and applications
-* Computer System Administration (to be uploaded)
+* Computer System Administration
 
 ### 4th grade
 
