@@ -24,7 +24,7 @@ This is a repository that lists and saves the homework and in-term projects I do
 ### 3rd grade
 
 * [LineChatbot](https://github.com/randyuncle/LineChatbot), the final project for `Theory of Computation`
-* Operating System (currently in github classroom, to be uploaded)
+* Operating System
 * Compiler System (currently in github classroom, to be uploaded)
 * Multimedia principles and applications
 * Computer System Administration (to be uploaded)
