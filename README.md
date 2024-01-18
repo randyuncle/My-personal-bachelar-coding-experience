@@ -25,7 +25,7 @@ This is a repository that lists and saves the homework and in-term projects I do
 
 * [LineChatbot](https://github.com/randyuncle/LineChatbot), the final project for `Theory of Computation`
 * Operating System
-* Compiler System (currently in github classroom, to be uploaded)
+* Compiler Construction
 * Multimedia principles and applications
 * Computer System Administration
 
